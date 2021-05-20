@@ -32,7 +32,7 @@ var Handler = /*#__PURE__*/function () {
     this._initAnimations(animations);
 
     return Object.freeze(Object.create({
-      timeout: this.timeout.bind(this),
+      onTimeout: this.onTimeout.bind(this),
       onClick: this.onClick.bind(this),
       onScroll: this.onScroll.bind(this)
     }));
@@ -49,20 +49,20 @@ var Handler = /*#__PURE__*/function () {
           css: Array.isArray(a.css) ? a.css : [a.css]
         });
 
-        _this._initCss(i);
+        _this._setDefaultAnimation(i);
       });
     }
   }, {
-    key: "_initCss",
-    value: function _initCss(index) {
+    key: "_setDefaultAnimation",
+    value: function _setDefaultAnimation(index) {
       var animation = this.animations[index],
           element = animation.element,
           css = animation.css;
-      if (css.length > 1) this._animateByCss(element, css[0]);
+      if (css.length > 1) this._toggleAnimation(element, css[0]);
     }
   }, {
-    key: "_animateByCss",
-    value: function _animateByCss(element, css) {
+    key: "_toggleAnimation",
+    value: function _toggleAnimation(element, css) {
       element.classList.toggle(css);
     }
   }, {
@@ -70,15 +70,15 @@ var Handler = /*#__PURE__*/function () {
     value: function _animate() {
       var _this2 = this;
 
-      this.animations.forEach(function (a) {
-        a.css.forEach(function (c) {
-          _this2._animateByCss(a.element, c);
+      this.animations.forEach(function (animation) {
+        animation.css.forEach(function (cssName) {
+          _this2._toggleAnimation(animation.element, cssName);
         });
       });
     }
   }, {
-    key: "timeout",
-    value: function timeout(time) {
+    key: "onTimeout",
+    value: function onTimeout(time) {
       var _this3 = this;
 
       setTimeout(function () {
@@ -164,6 +164,9 @@ var Parallax = /*#__PURE__*/function () {
     this.target = document.getElementById(target);
     this.direction = direction;
     this.minOffset = minOffset;
+
+    this._updateMovement();
+
     return Object.freeze(Object.create({
       serve: this.serve.bind(this)
     }));
@@ -181,8 +184,6 @@ var Parallax = /*#__PURE__*/function () {
     key: "serve",
     value: function serve() {
       var _this = this;
-
-      this._updateMovement();
 
       window.addEventListener("scroll", function () {
         _this._updateMovement();
@@ -296,7 +297,7 @@ var initLoader = function initLoader() {
       element: "loader",
       css: "disappear"
     });
-    resolve(loader.timeout(1200));
+    resolve(loader.onTimeout(1200));
   });
 };
 
